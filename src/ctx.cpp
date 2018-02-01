@@ -9,6 +9,8 @@
 #include "ctx.h"
 #include "event.h"
 #include "luautils.h"
+#include "utilityapi.h"
+#include "playbackapi.h"
 
 static std::unordered_map<lua_State*,xxPlugin*> xvStateKey; // lua_State*:plugin
 static std::unordered_map<std::string,xxPlugin*> xvLoaded; // identifier:plugin
@@ -19,6 +21,8 @@ static void xxInitEnv(lua_State *L)
 
     lua_newtable(L);
     xxInitEnvEvent(L);
+    xxInitEnvUtility(L);
+    xxInitEnvPlayback(L);
 
     lua_setglobal(L,"xp");
 }

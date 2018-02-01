@@ -19,8 +19,11 @@ void xpUnloadPlugin(const char *id);
 #define XP_IDENTIFIER_ALREADY_EXISTS 5
 #define XP_INITIALIZE_FAILED 6
 
-void xpEvent(const char *event);
+bool xpEvent(const char *event);
 
+extern void (^xcAlert)(const char *,unsigned int);
+extern const char *(^xcCurrentURL)();
+extern void (^xcOpenURL)(const char *);
 #ifdef __cplusplus
 }
 #endif

@@ -25,7 +25,6 @@ static int xxlListenStop(lua_State *L)
 {
     static const char *fn="listen_stop";
     if(xxCheckType(L,fn,1,LUA_TSTRING)==tMismatch) return 0;
-    auto event = std::string(lua_tostring(L,1));
     xxListenStop(xxGetPluginByLState(L),std::string(lua_tostring(L,1)));
     return 0;
 }
@@ -52,7 +51,7 @@ bool xxListen(xxPlugin *plg,const std::string &event,int ref)
 
 void xxListenStop(xxPlugin *plg,const std::string &event)
 {
-    auto &lst =  xvEventListenning[event];
+    auto &lst = xvEventListenning[event];
     if(plg->listenning.count(event) != 0)
     {
         auto iter = lst.find(plg);
@@ -60,6 +59,7 @@ void xxListenStop(xxPlugin *plg,const std::string &event)
         lst.erase(iter);
         plg->listenning.erase(plg->listenning.find(event));
     }
+    std::cout << "AFTRE"<<lst.size()<<std::endl;
 }
 
 void xxListenStopAll(xxPlugin *plg)
@@ -71,13 +71,18 @@ void xxListenStopAll(xxPlugin *plg)
     }
 }
 
-void xpEvent(const char *event)
+bool xpEvent(const char *event)
 {
-    for(auto pa : xvEventListenning[event])
+    bool ret = false;
+    auto lst = xvEventListenning[event];
+    if(lst.size() == 0) return false;
+    for(const auto &pa : lst)
     {
         lua_State *L = pa.first->lua;
         xxSafeCallStart(L);
         lua_getref(L,pa.second);
-        xxSafeCallEnd(L,0,0);
+        xxSafeCallEnd(L,0,1);
+        if(ret == false && lua_gettop(L) >= 1 && lua_toboolean(L,1)) ret = true;
     }
+    return ret;
 }
